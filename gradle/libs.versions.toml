@@ -10,6 +10,10 @@ material = "1.12.0"
 activity = "1.10.0"
 constraintlayout = "2.2.0"
 coil = "2.6.0"
+camera = "1.4.1"
+face-detection = "16.1.7"
+tensorflow-lite = "2.9.0"
+tensorflow-lite-support = "0.4.3"
 lifecycle = "2.8.7"
 fragment-ktx = "1.8.5"
 navigationFragmentKtx = "2.8.6"
@@ -17,9 +21,6 @@ navigationUiKtx = "2.8.6"
 room = "2.6.1"
 ksp = "1.9.10-1.0.13"
 coroutine = "1.7.3"
-retrofit = "2.9.0"
-okhttp = "4.12.0"
-koin = "3.5.6"
 ktlint = "12.1.0"
 mockk = "1.13.10"
 coroutine-test = "1.7.3"
@@ -40,6 +41,20 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 # coil image loader
 coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
 
+# camera
+camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "camera" }
+camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "camera" }
+camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "camera" }
+camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "camera" }
+
+# face detection
+face-detection = { group = "com.google.mlkit", name = "face-detection", version.ref = "face-detection" }
+
+# tensorflow lite
+tensorflow-lite = { group = "org.tensorflow", name = "tensorflow-lite", version.ref = "tensorflow-lite" }
+tensorflow-lite-gpu = { group = "org.tensorflow", name = "tensorflow-lite-gpu", version.ref = "tensorflow-lite" }
+tensorflow-lite-support = { group = "org.tensorflow", name = "tensorflow-lite-support", version.ref = "tensorflow-lite-support" }
+
 # lifecycle
 lifecycle-runtime = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
 lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
@@ -59,14 +74,6 @@ room-compiler = { group = "androidx.room", name = "room-compiler", version.ref =
 # coroutine
 coroutine-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutine" }
 coroutine-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutine" }
-
-# retrofit
-retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
-retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
-okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
-
-# Koin
-koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 
 # Unit Testing
 mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
