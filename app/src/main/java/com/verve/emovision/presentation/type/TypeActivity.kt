@@ -5,8 +5,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
-import com.verve.emovision.data.source.ItemExpression
 import com.verve.emovision.data.model.Expression
+import com.verve.emovision.data.source.ItemExpression
 import com.verve.emovision.databinding.ActivityTypeBinding
 import com.verve.emovision.presentation.detail.DetailActivity
 import com.verve.emovision.presentation.type.adapter.ExpressionAdapter

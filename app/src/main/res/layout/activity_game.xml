@@ -10,7 +10,7 @@
         android:layout_height="wrap_content">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar_expression"
+            android:id="@+id/toolbar_games"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
@@ -37,23 +37,23 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
-                android:text="@string/text_type_of_expression"
+                android:text="@string/text_games"
                 android:textColor="?attr/colorSurface"
                 android:textSize="20sp" />
 
         </androidx.appcompat.widget.Toolbar>
 
         <FrameLayout
-            android:id="@+id/fl_expression"
+            android:id="@+id/fl_games"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/toolbar_expression">
+            app:layout_constraintTop_toBottomOf="@id/toolbar_games">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_expression"
+                android:id="@+id/rv_games"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clickable="true"
@@ -61,10 +61,10 @@
                 android:orientation="vertical"
                 app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                 app:spanCount="2"
-                tools:listitem="@layout/item_expression_grid" />
+                tools:listitem="@layout/item_game_grid" />
 
             <com.google.android.material.progressindicator.CircularProgressIndicator
-                android:id="@+id/pb_loading_expression"
+                android:id="@+id/pb_loading_games"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center|top"

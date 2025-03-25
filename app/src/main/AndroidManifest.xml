@@ -6,7 +6,7 @@
         android:name="android.hardware.camera.any"
         android:required="false" />
 
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:name=".App"
@@ -20,6 +20,15 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".presentation.games.GameActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.games.quiz.QuizActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.games.face_match.FaceMatchActivity"
+            android:exported="false" />
         <activity
             android:name=".presentation.type.TypeActivity"
             android:exported="false" />
