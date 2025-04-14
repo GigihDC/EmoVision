@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_quiz_game"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:titleTextColor="#FFFFFF">
+
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"
+            android:src="@drawable/ic_back"
+            app:tint="@color/md_theme_onPrimary" />
+
+        <TextView
+            android:id="@+id/toolbar_title"
+            style="@style/TextAppearance.Material3.TitleMedium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:text="@string/text_game_quiz"
+            android:textColor="?attr/colorSurface"
+            android:textSize="20sp" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/fl_quiz_game"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        android:padding="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_quiz_game">
+
+        <TextView
+            android:id="@+id/tv_question"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:padding="8dp"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/btn_options_1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Question?" />
+
+        <Button
+            android:id="@+id/btn_options_1"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_margin="16dp"
+            android:background="@drawable/bg_corner"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:backgroundTint="@color/pink"
+            app:layout_constraintBottom_toTopOf="@id/btn_options_2"
+            tools:text="Option 1" />
+
+        <Button
+            android:id="@+id/btn_options_2"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_margin="16dp"
+            android:background="@drawable/bg_corner"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:backgroundTint="@color/yellow_pastel"
+            app:layout_constraintBottom_toTopOf="@id/btn_options_3"
+            tools:text="Option 2" />
+
+        <Button
+            android:id="@+id/btn_options_3"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_margin="16dp"
+            android:background="@drawable/bg_corner"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:backgroundTint="@color/cyan_pastel"
+            app:layout_constraintBottom_toTopOf="@id/btn_options_4"
+            tools:text="Option 3" />
+
+        <Button
+            android:id="@+id/btn_options_4"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_margin="16dp"
+            android:background="@drawable/bg_corner"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:backgroundTint="@color/blue_pastel"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:text="Option 4" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
