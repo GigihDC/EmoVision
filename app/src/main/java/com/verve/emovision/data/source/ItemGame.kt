@@ -14,7 +14,7 @@ object ItemGame {
             Game(
                 2,
                 R.string.text_game_quiz,
-                R.drawable.img_disgust,
+                R.drawable.img_emo_quiz,
             ),
         )
 }

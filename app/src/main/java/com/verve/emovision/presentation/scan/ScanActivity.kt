@@ -47,9 +47,16 @@ class ScanActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         overlayView = findViewById(R.id.overlayView)
+        setOnClickListener()
         initTensorFlow()
         requestPermissions()
         initCameraExecutor()
+    }
+
+    private fun setOnClickListener() {
+        binding.ivBack.setOnClickListener {
+            onBackPressed()
+        }
     }
 
     private fun initTensorFlow() {
