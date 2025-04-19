@@ -1,21 +1,31 @@
 package com.verve.emovision.presentation.splash
 
+import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
+import android.os.Handler
+import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.verve.emovision.R
+import com.verve.emovision.databinding.ActivitySplashBinding
+import com.verve.emovision.presentation.main.MainActivity
 
 class SplashActivity : AppCompatActivity() {
+    private val binding: ActivitySplashBinding by lazy {
+        ActivitySplashBinding.inflate(layoutInflater)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_splash)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+        setContentView(binding.root)
+        navigateToMain()
+    }
+
+    private fun navigateToMain() {
+        Handler(Looper.getMainLooper()).postDelayed({
+            startActivity(
+                Intent(this, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                },
+            )
+        }, 2000)
     }
 }

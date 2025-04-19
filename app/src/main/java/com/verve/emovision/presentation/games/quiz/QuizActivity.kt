@@ -7,10 +7,13 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.lifecycleScope
 import com.verve.emovision.R
 import com.verve.emovision.data.model.Question
 import com.verve.emovision.data.source.ItemQuestions
 import com.verve.emovision.databinding.ActivityQuizBinding
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class QuizActivity : AppCompatActivity() {
     private val binding: ActivityQuizBinding by lazy {
@@ -64,10 +67,13 @@ class QuizActivity : AppCompatActivity() {
         questionsAnswered++
         currentQuestionIndex++
 
-        if (questionsAnswered == 10) {
-            showScore()
-        } else {
-            displayQuestion()
+        lifecycleScope.launch {
+            delay(500)
+            if (questionsAnswered == 10) {
+                showScore()
+            } else {
+                displayQuestion()
+            }
         }
     }
 
