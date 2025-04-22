@@ -3,8 +3,12 @@ package com.verve.emovision.presentation.games.face_match
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.graphics.Matrix
+import android.graphics.Paint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -44,14 +48,16 @@ class FaceMatchActivity : AppCompatActivity() {
     private lateinit var cameraExecutor: ExecutorService
     private var tflite: Interpreter? = null
     private var cameraProvider: ProcessCameraProvider? = null
+    private var hasStarted = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         gameView = binding.gameView
         setOnClickListener()
+        showTapToStart()
+        updateScoreUI()
         initTensorFlow()
-        requestPermissions()
         initCameraExecutor()
         setNextExpression()
     }
@@ -60,6 +66,22 @@ class FaceMatchActivity : AppCompatActivity() {
         binding.ivBack.setOnClickListener {
             onBackPressed()
         }
+
+        binding.root.setOnClickListener {
+            if (!hasStarted) {
+                hasStarted = true
+                hideTapToStart()
+                requestPermissions()
+            }
+        }
+    }
+
+    private fun showTapToStart() {
+        binding.tvTapToStart.visibility = View.VISIBLE
+    }
+
+    private fun hideTapToStart() {
+        binding.tvTapToStart.visibility = View.GONE
     }
 
     private fun initTensorFlow() {
@@ -170,6 +192,7 @@ class FaceMatchActivity : AppCompatActivity() {
 
         val builder = AlertDialog.Builder(this)
         builder.setView(dialogView)
+        builder.setCancelable(true)
 
         val dialog = builder.create()
         dialogView.findViewById<Button>(R.id.btn_restart).setOnClickListener {
@@ -178,7 +201,11 @@ class FaceMatchActivity : AppCompatActivity() {
         }
         dialogView.findViewById<Button>(R.id.btn_close).setOnClickListener {
             dialog.dismiss()
-            onBackPressed()
+            finish()
+        }
+        dialog.setOnCancelListener {
+            dialog.dismiss()
+            finish()
         }
 
         dialog.show()
@@ -220,20 +247,31 @@ class FaceMatchActivity : AppCompatActivity() {
             Bitmap.createBitmap(argbBitmap, 0, 0, argbBitmap.width, argbBitmap.height, matrix, true)
 
         val resizedBitmap = Bitmap.createScaledBitmap(mirroredBitmap, 48, 48, true)
-        val buffer = ByteBuffer.allocateDirect(4 * 48 * 48)
-        buffer.order(ByteOrder.nativeOrder())
+
+        val grayscaleBitmap = Bitmap.createBitmap(48, 48, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(grayscaleBitmap)
+        val paint = Paint()
+        val colorMatrix = ColorMatrix()
+        colorMatrix.setSaturation(0f)
+        val filter = ColorMatrixColorFilter(colorMatrix)
+        paint.colorFilter = filter
+        canvas.drawBitmap(resizedBitmap, 0f, 0f, paint)
+
+        val byteBuffer =
+            ByteBuffer.allocateDirect(1 * 48 * 48 * 1 * 4)
+        byteBuffer.order(ByteOrder.nativeOrder())
 
         for (y in 0 until 48) {
             for (x in 0 until 48) {
-                val pixel = resizedBitmap.getPixel(x, y)
-                val grayscale =
-                    (Color.red(pixel) * 0.299 + Color.green(pixel) * 0.587 + Color.blue(pixel) * 0.114) / 255.0
-                buffer.putFloat(grayscale.toFloat())
+                val pixel = grayscaleBitmap.getPixel(x, y)
+                val r = Color.red(pixel)
+                val normalizedPixel = r / 255.0f
+                byteBuffer.putFloat(normalizedPixel)
             }
         }
 
-        buffer.rewind()
-        return buffer
+        byteBuffer.rewind()
+        return byteBuffer
     }
 
     private fun loadModelFile(): ByteBuffer {

@@ -3,8 +3,12 @@ package com.verve.emovision.presentation.scan
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.graphics.Matrix
+import android.graphics.Paint
 import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
@@ -40,6 +44,7 @@ class ScanActivity : AppCompatActivity() {
     }
     private lateinit var overlayView: OverlayView
     private lateinit var cameraExecutor: ExecutorService
+    private var lensFacing = CameraSelector.LENS_FACING_FRONT
     private var tflite: Interpreter? = null
     private var cameraProvider: ProcessCameraProvider? = null
 
@@ -56,6 +61,17 @@ class ScanActivity : AppCompatActivity() {
     private fun setOnClickListener() {
         binding.ivBack.setOnClickListener {
             onBackPressed()
+        }
+
+        binding.btnSwitch.setOnClickListener {
+            lensFacing =
+                if (lensFacing == CameraSelector.LENS_FACING_FRONT) {
+                    CameraSelector.LENS_FACING_BACK
+                } else {
+                    CameraSelector.LENS_FACING_FRONT
+                }
+            animatePreviewFlip()
+            startCamera()
         }
     }
 
@@ -96,13 +112,28 @@ class ScanActivity : AppCompatActivity() {
 
             val imageAnalyzer =
                 ImageAnalysis.Builder().build().also {
-//                    it.setTargetRotation(binding.previewView.display.rotation)
                     it.setAnalyzer(cameraExecutor) { imageProxy -> analyzeImage(imageProxy) }
                 }
 
-            val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
+            val cameraSelector =
+                CameraSelector.Builder().requireLensFacing(lensFacing).build()
+            cameraProvider?.unbindAll()
             cameraProvider?.bindToLifecycle(this, cameraSelector, preview, imageAnalyzer)
         }, ContextCompat.getMainExecutor(this))
+    }
+
+    private fun animatePreviewFlip() {
+        binding.previewView.animate()
+            .scaleX(0f)
+            .setDuration(250)
+            .withEndAction {
+                binding.previewView.rotationY += 180f
+                binding.previewView.animate()
+                    .scaleX(1f)
+                    .setDuration(250)
+                    .start()
+            }
+            .start()
     }
 
     @OptIn(ExperimentalGetImage::class)
@@ -124,12 +155,14 @@ class ScanActivity : AppCompatActivity() {
             .addOnSuccessListener { faces ->
                 val faceBoxes = mutableListOf<FaceBox>()
 
+                val bitmap = imageProxy.toBitmap()
+                val isFrontCamera = (lensFacing == CameraSelector.LENS_FACING_FRONT)
+
                 for (face in faces) {
-                    val bitmap = imageProxy.toBitmap().flipHorizontal()
                     val faceBitmap = cropFace(bitmap, face)
 
                     if (faceBitmap != null && tflite != null) {
-                        val prediction = runInference(faceBitmap)
+                        val prediction = runInference(faceBitmap, isFrontCamera)
                         val adjustedBox =
                             adjustBoundingBox(face.boundingBox, bitmap.width, bitmap.height)
                         faceBoxes.add(FaceBox(adjustedBox, prediction))
@@ -167,8 +200,11 @@ class ScanActivity : AppCompatActivity() {
         )
     }
 
-    private fun runInference(bitmap: Bitmap): String {
-        val input = preprocessBitmap(bitmap)
+    private fun runInference(
+        bitmap: Bitmap,
+        isFrontCamera: Boolean,
+    ): String {
+        val input = preprocessBitmap(bitmap, isFrontCamera)
         val output = Array(1) { FloatArray(7) }
         tflite?.run(input, output)
 
@@ -177,44 +213,65 @@ class ScanActivity : AppCompatActivity() {
         val labels =
             arrayOf(
                 getString(R.string.text_expression_angry),
-                getString(R.string.text_expression_angry),
-                getString(R.string.text_expression_angry),
+                getString(R.string.text_expression_disgust),
+                getString(R.string.text_expression_fear),
                 getString(R.string.text_expression_happy),
                 getString(R.string.text_expression_neutral),
                 getString(R.string.text_expression_sad),
                 getString(R.string.text_expression_surprise),
             )
 
-        return if (maxConfidence > 0.5 && predictedIndex in labels.indices) {
+        return if (maxConfidence > 0.4 && predictedIndex in labels.indices) {
             "${labels[predictedIndex]} (${String.format("%.2f", maxConfidence * 100)}%)"
         } else {
             getString(R.string.text_expression_neutral)
         }
     }
 
-    private fun preprocessBitmap(bitmap: Bitmap): ByteBuffer {
-        // 1. Pastikan format bitmap ARGB_8888 untuk kualitas terbaik
+    private fun preprocessBitmap(
+        bitmap: Bitmap,
+        isFrontCamera: Boolean,
+    ): ByteBuffer {
         val argbBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
 
-        // 2. Mirror gambar untuk kamera depan
-        val matrix = Matrix().apply { preScale(-1f, 1f) }
-        val mirroredBitmap = Bitmap.createBitmap(argbBitmap, 0, 0, argbBitmap.width, argbBitmap.height, matrix, true)
+        // 2. Mirror gambar kalau kamera depan
+        val processedBitmap =
+            if (isFrontCamera) {
+                val matrix = Matrix().apply { preScale(-1f, 1f) }
+                Bitmap.createBitmap(argbBitmap, 0, 0, argbBitmap.width, argbBitmap.height, matrix, true)
+            } else {
+                argbBitmap
+            }
 
-        // 3. Resize gambar ke 48x48 untuk model CNN
-        val resizedBitmap = Bitmap.createScaledBitmap(mirroredBitmap, 48, 48, true)
-        val buffer = ByteBuffer.allocateDirect(4 * 48 * 48)
-        buffer.order(ByteOrder.nativeOrder())
+        // 3. Resize ke 48x48
+        val resizedBitmap = Bitmap.createScaledBitmap(processedBitmap, 48, 48, true)
+
+        // 4. Konversi ke grayscale pakai ColorMatrix
+        val grayscaleBitmap = Bitmap.createBitmap(48, 48, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(grayscaleBitmap)
+        val paint = Paint()
+        val colorMatrix = ColorMatrix()
+        colorMatrix.setSaturation(0f)
+        val filter = ColorMatrixColorFilter(colorMatrix)
+        paint.colorFilter = filter
+        canvas.drawBitmap(resizedBitmap, 0f, 0f, paint)
+
+        // 5. Buat ByteBuffer untuk input model
+        val byteBuffer =
+            ByteBuffer.allocateDirect(1 * 48 * 48 * 1 * 4) // 1 (batch) × 48 × 48 × 1 (grayscale) × 4 bytes (float32)
+        byteBuffer.order(ByteOrder.nativeOrder())
 
         for (y in 0 until 48) {
             for (x in 0 until 48) {
-                val pixel = resizedBitmap.getPixel(x, y)
-                val grayscale = (Color.red(pixel) * 0.299 + Color.green(pixel) * 0.587 + Color.blue(pixel) * 0.114) / 255.0
-                buffer.putFloat(grayscale.toFloat())
+                val pixel = grayscaleBitmap.getPixel(x, y)
+                val r = Color.red(pixel)
+                val normalizedPixel = r / 255.0f
+                byteBuffer.putFloat(normalizedPixel)
             }
         }
 
-        buffer.rewind()
-        return buffer
+        byteBuffer.rewind()
+        return byteBuffer
     }
 
     private fun loadModelFile(): ByteBuffer {

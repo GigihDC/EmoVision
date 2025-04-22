@@ -1,12 +1,14 @@
 package com.verve.emovision.presentation.games.quiz
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.verve.emovision.R
 import com.verve.emovision.data.model.Question
@@ -24,37 +26,63 @@ class QuizActivity : AppCompatActivity() {
     private var score = 0
     private var questionsAnswered = 0
     private val pointsPerQuestion = 10
+    private var hasStarted = false
+    private val options =
+        listOf(
+            binding.btnOptions1,
+            binding.btnOptions2,
+            binding.btnOptions3,
+            binding.btnOptions4,
+        )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         questions = ItemQuestions.getQuestions().shuffled().take(10)
         setOnClickListener()
-        displayQuestion()
+        showTapToStart()
     }
 
     private fun setOnClickListener() {
         binding.ivBack.setOnClickListener {
             onBackPressed()
         }
+
+        binding.root.setOnClickListener {
+            if (!hasStarted) {
+                hasStarted = true
+                hideTapToStart()
+                displayQuestion()
+            }
+        }
+    }
+
+    private fun showTapToStart() {
+        binding.tvTapToStart.visibility = View.VISIBLE
+        options.forEach { button ->
+            button.isVisible = false
+        }
+    }
+
+    private fun hideTapToStart() {
+        binding.tvTapToStart.visibility = View.GONE
+        options.forEach { button ->
+            button.isVisible = true
+        }
     }
 
     private fun displayQuestion() {
         if (currentQuestionIndex < questions.size) {
             val question = questions[currentQuestionIndex]
-            findViewById<TextView>(R.id.tv_question).setText(question.question)
-
-            val options =
-                listOf(
-                    findViewById<Button>(R.id.btn_options_1),
-                    findViewById<Button>(R.id.btn_options_2),
-                    findViewById<Button>(R.id.btn_options_3),
-                    findViewById<Button>(R.id.btn_options_4),
-                )
+            binding.tvQuestion.setText(question.question)
 
             options.forEachIndexed { index, button ->
                 button.setText(question.options[index])
-                button.setOnClickListener { handleAnswer(index) }
+                button.setOnClickListener {
+                    if (hasStarted) {
+                        handleAnswer(index)
+                    }
+                }
             }
         }
     }
@@ -106,11 +134,9 @@ class QuizActivity : AppCompatActivity() {
             dialog.dismiss()
             finish()
         }
-
         btnOk.setOnClickListener {
             dismissDialog()
         }
-
         dialog.setOnCancelListener {
             dismissDialog()
         }

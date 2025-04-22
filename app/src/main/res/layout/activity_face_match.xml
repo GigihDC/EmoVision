@@ -7,7 +7,7 @@
     android:fitsSystemWindows="true">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar_funny_game"
+        android:id="@+id/toolbar_face_match"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
@@ -58,7 +58,7 @@
         android:paddingStart="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintEnd_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar_funny_game"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_face_match"
         tools:ignore="RtlSymmetry">
 
         <TextView
@@ -136,5 +136,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/score" />
+
+    <TextView
+        android:id="@+id/tv_tap_to_start"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80808080"
+        android:gravity="center"
+        android:text="@string/text_tap_to_start"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_face_match" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

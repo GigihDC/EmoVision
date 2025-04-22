@@ -27,12 +27,11 @@ class OverlayView(context: Context, attrs: AttributeSet?) : View(context, attrs)
 
     fun updateFaces(faces: List<FaceBox>) {
         faceBoxes = faces
-        invalidate() // Refresh tampilan
+        invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-
         for (face in faceBoxes) {
             val box = face.box
 

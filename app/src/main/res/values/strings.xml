@@ -130,4 +130,5 @@
     <string name="text_ok">OK</string>
     <string name="text_quiz_finished">Quiz Selesai!</string>
     <string name="text_on_back_pressed">Tekan sekali lagi untuk keluar</string>
+    <string name="text_tap_to_start">Ketuk Layar untuk Memulai</string>
 </resources>

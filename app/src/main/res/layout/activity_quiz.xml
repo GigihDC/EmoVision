@@ -120,4 +120,19 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <TextView
+        android:id="@+id/tv_tap_to_start"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80808080"
+        android:gravity="center"
+        android:text="@string/text_tap_to_start"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_quiz_game" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
