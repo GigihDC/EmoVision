@@ -7,7 +7,7 @@
     android:fitsSystemWindows="true">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar_about"
+        android:id="@+id/toolbar_help"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
@@ -34,7 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
-            android:text="@string/text_about_app"
+            android:text="@string/text_help"
             android:textColor="?attr/colorSurface"
             android:textSize="20sp" />
 
@@ -43,10 +43,9 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_app"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar_about">
+        app:layout_constraintTop_toBottomOf="@id/toolbar_help">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -55,54 +54,20 @@
             android:padding="16dp">
 
             <ImageView
-                android:layout_width="200dp"
-                android:layout_height="200dp"
-                android:layout_gravity="center"
-                android:src="@drawable/img_logo" />
-
-            <TextView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:justificationMode="inter_word"
-                android:text="@string/text_about_desc"
-                android:textSize="16sp"
-                android:textColor="@color/white"
-                tools:targetApi="o" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/text_developer_team"
-                android:textColor="@color/white"
-                android:textSize="20sp"
-                android:textStyle="bold"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="300dp"
                 android:layout_marginTop="8dp"
+                android:src="@drawable/img_illustration" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
                 android:layout_marginBottom="100dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-                <ImageView
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_margin="8dp"
-                    android:background="@drawable/bg_vector"
-                    android:backgroundTint="@color/white"
-                    android:src="@drawable/img_gigih"
-                    android:elevation="4dp"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="@string/text_name_developer_1"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"
-                    android:textStyle="bold"/>
-            </LinearLayout>
+                android:justificationMode="inter_word"
+                android:text="@string/text_help_desc"
+                android:textSize="16sp"
+                tools:targetApi="o" />
         </LinearLayout>
     </ScrollView>
 

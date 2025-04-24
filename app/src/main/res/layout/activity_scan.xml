@@ -30,12 +30,21 @@
         <TextView
             android:id="@+id/toolbar_title"
             style="@style/TextAppearance.Material3.TitleMedium"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
             android:text="@string/text_scan"
             android:textColor="?attr/colorSurface"
             android:textSize="20sp" />
+
+        <ImageView
+            android:id="@+id/iv_help"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/ic_help"
+            app:tint="@color/md_theme_onPrimary" />
 
     </androidx.appcompat.widget.Toolbar>
 

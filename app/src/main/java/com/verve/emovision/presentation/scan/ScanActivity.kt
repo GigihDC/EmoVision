@@ -1,6 +1,7 @@
 package com.verve.emovision.presentation.scan
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -28,6 +29,7 @@ import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.verve.emovision.R
 import com.verve.emovision.databinding.ActivityScanBinding
+import com.verve.emovision.presentation.help.HelpActivity
 import com.verve.emovision.utils.FaceBox
 import com.verve.emovision.utils.OverlayView
 import org.tensorflow.lite.Interpreter
@@ -62,7 +64,9 @@ class ScanActivity : AppCompatActivity() {
         binding.ivBack.setOnClickListener {
             onBackPressed()
         }
-
+        binding.ivHelp.setOnClickListener {
+            startActivity(Intent(this, HelpActivity::class.java))
+        }
         binding.btnSwitch.setOnClickListener {
             lensFacing =
                 if (lensFacing == CameraSelector.LENS_FACING_FRONT) {
@@ -238,7 +242,15 @@ class ScanActivity : AppCompatActivity() {
         val processedBitmap =
             if (isFrontCamera) {
                 val matrix = Matrix().apply { preScale(-1f, 1f) }
-                Bitmap.createBitmap(argbBitmap, 0, 0, argbBitmap.width, argbBitmap.height, matrix, true)
+                Bitmap.createBitmap(
+                    argbBitmap,
+                    0,
+                    0,
+                    argbBitmap.width,
+                    argbBitmap.height,
+                    matrix,
+                    true,
+                )
             } else {
                 argbBitmap
             }

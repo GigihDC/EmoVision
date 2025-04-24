@@ -21,6 +21,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".presentation.help.HelpActivity"
+            android:exported="false" />
+        <activity
             android:name=".presentation.games.GameActivity"
             android:exported="false" />
         <activity
