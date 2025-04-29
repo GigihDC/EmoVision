@@ -1,5 +1,6 @@
 package com.verve.emovision.presentation.games.quiz
 
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -21,23 +22,27 @@ class QuizActivity : AppCompatActivity() {
     private val binding: ActivityQuizBinding by lazy {
         ActivityQuizBinding.inflate(layoutInflater)
     }
+    private lateinit var options: List<Button>
     private lateinit var questions: List<Question>
     private var currentQuestionIndex = 0
     private var score = 0
     private var questionsAnswered = 0
     private val pointsPerQuestion = 10
     private var hasStarted = false
-    private val options =
-        listOf(
-            binding.btnOptions1,
-            binding.btnOptions2,
-            binding.btnOptions3,
-            binding.btnOptions4,
-        )
+    private var bgmPlayer: MediaPlayer? = null
+    private var startTime: Long = 0
+    private var endTime: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        options =
+            listOf(
+                binding.btnOptions1,
+                binding.btnOptions2,
+                binding.btnOptions3,
+                binding.btnOptions4,
+            )
         questions = ItemQuestions.getQuestions().shuffled().take(10)
         setOnClickListener()
         showTapToStart()
@@ -52,9 +57,22 @@ class QuizActivity : AppCompatActivity() {
             if (!hasStarted) {
                 hasStarted = true
                 hideTapToStart()
+                startTime = System.currentTimeMillis()
+                startBgm()
                 displayQuestion()
             }
         }
+    }
+
+    private fun startBgm() {
+        val afd = assets.openFd("bgm_game.mp3")
+        bgmPlayer =
+            MediaPlayer().apply {
+                setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+                isLooping = true
+                prepare()
+                start()
+            }
     }
 
     private fun showTapToStart() {
@@ -113,6 +131,15 @@ class QuizActivity : AppCompatActivity() {
                 .setCancelable(true)
                 .create()
 
+        endTime = System.currentTimeMillis()
+        val durationMillis = endTime - startTime
+        val totalSeconds = durationMillis / 1000
+        val minutes = totalSeconds / 60
+        val seconds = totalSeconds % 60
+        val timeTakenText = "Waktu penyelesaian: ${minutes}m ${seconds}s"
+        val tvTimeTaken = dialogView.findViewById<TextView>(R.id.tv_time_taken)
+        tvTimeTaken.text = timeTakenText
+
         val progressCorrect = dialogView.findViewById<ProgressBar>(R.id.progress_correct)
         val progressWrong = dialogView.findViewById<ProgressBar>(R.id.progress_wrong)
         val tvScorePercentage = dialogView.findViewById<TextView>(R.id.tv_score_percentage)
@@ -142,5 +169,11 @@ class QuizActivity : AppCompatActivity() {
         }
 
         dialog.show()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        bgmPlayer?.release()
+        bgmPlayer = null
     }
 }

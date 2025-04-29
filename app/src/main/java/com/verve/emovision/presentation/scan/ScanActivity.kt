@@ -12,6 +12,9 @@ import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Rect
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
@@ -37,6 +40,7 @@ import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.channels.FileChannel
+import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -49,6 +53,10 @@ class ScanActivity : AppCompatActivity() {
     private var lensFacing = CameraSelector.LENS_FACING_FRONT
     private var tflite: Interpreter? = null
     private var cameraProvider: ProcessCameraProvider? = null
+    private var textToSpeech: TextToSpeech? = null
+    private var lastExpression: String = ""
+    private val handler = Handler(Looper.getMainLooper())
+    private lateinit var ttsRunnable: Runnable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +64,7 @@ class ScanActivity : AppCompatActivity() {
         overlayView = findViewById(R.id.overlayView)
         setOnClickListener()
         initTensorFlow()
+        initSoundOfExpression()
         requestPermissions()
         initCameraExecutor()
     }
@@ -65,6 +74,7 @@ class ScanActivity : AppCompatActivity() {
             onBackPressed()
         }
         binding.ivHelp.setOnClickListener {
+            pauseDetection()
             startActivity(Intent(this, HelpActivity::class.java))
         }
         binding.btnSwitch.setOnClickListener {
@@ -87,6 +97,33 @@ class ScanActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e("TFLite", "Gagal memuat model: ${e.localizedMessage}")
         }
+    }
+
+    private fun initSoundOfExpression() {
+        textToSpeech =
+            TextToSpeech(this) { status ->
+                if (status == TextToSpeech.SUCCESS) {
+                    val result = textToSpeech?.setLanguage(Locale("id", "ID"))
+                    if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        Log.e("TTS", "Bahasa tidak didukung")
+                    } else {
+                        Log.d("TTS", "TextToSpeech siap digunakan")
+                    }
+                } else {
+                    Log.e("TTS", "Inisialisasi TextToSpeech gagal")
+                }
+            }
+
+        ttsRunnable =
+            object : Runnable {
+                override fun run() {
+                    if (lastExpression.isNotEmpty()) {
+                        speakExpression(lastExpression)
+                    }
+                    handler.postDelayed(this, 2000)
+                }
+            }
+        handler.postDelayed(ttsRunnable, 2000)
     }
 
     private fun requestPermissions() {
@@ -138,6 +175,17 @@ class ScanActivity : AppCompatActivity() {
                     .start()
             }
             .start()
+    }
+
+    private fun pauseDetection() {
+        cameraProvider?.unbindAll()
+        handler.removeCallbacks(ttsRunnable)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        startCamera()
+        handler.postDelayed(ttsRunnable, 2000)
     }
 
     @OptIn(ExperimentalGetImage::class)
@@ -226,10 +274,16 @@ class ScanActivity : AppCompatActivity() {
             )
 
         return if (maxConfidence > 0.4 && predictedIndex in labels.indices) {
+            lastExpression = labels[predictedIndex]
             "${labels[predictedIndex]} (${String.format("%.2f", maxConfidence * 100)}%)"
         } else {
+            lastExpression = getString(R.string.text_expression_neutral)
             getString(R.string.text_expression_neutral)
         }
+    }
+
+    private fun speakExpression(expression: String) {
+        textToSpeech?.speak(expression, TextToSpeech.QUEUE_FLUSH, null, null)
     }
 
     private fun preprocessBitmap(
@@ -303,8 +357,7 @@ class ScanActivity : AppCompatActivity() {
     ): Bitmap? {
         val box = face.boundingBox
 
-        // Tambahkan padding agar wajah tidak terpotong terlalu ketat
-        val paddingFactor = 0.2f // Tambahkan 20% padding
+        val paddingFactor = 0.2f
         val width = box.width()
         val height = box.height()
         val extraWidth = (width * paddingFactor).toInt()
@@ -319,15 +372,14 @@ class ScanActivity : AppCompatActivity() {
         val finalHeight = bottom - top
 
         return if (finalWidth > 0 && finalHeight > 0) {
-            Bitmap.createBitmap(bitmap, left, top, finalWidth, finalHeight)
+            try {
+                Bitmap.createBitmap(bitmap, left, top, finalWidth, finalHeight)
+            } catch (e: IllegalArgumentException) {
+                null
+            }
         } else {
             null
         }
-    }
-
-    private fun Bitmap.flipHorizontal(): Bitmap {
-        val matrix = Matrix().apply { preScale(-1f, 1f) }
-        return Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
     }
 
     override fun onDestroy() {
@@ -336,5 +388,8 @@ class ScanActivity : AppCompatActivity() {
         tflite?.close()
         tflite = null
         cameraProvider?.unbindAll()
+        textToSpeech?.stop()
+        textToSpeech?.shutdown()
+        handler.removeCallbacks(ttsRunnable)
     }
 }

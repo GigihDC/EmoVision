@@ -9,6 +9,7 @@ import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Matrix
 import android.graphics.Paint
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -49,6 +50,7 @@ class FaceMatchActivity : AppCompatActivity() {
     private var tflite: Interpreter? = null
     private var cameraProvider: ProcessCameraProvider? = null
     private var hasStarted = false
+    private var bgmPlayer: MediaPlayer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,6 +74,7 @@ class FaceMatchActivity : AppCompatActivity() {
                 hasStarted = true
                 hideTapToStart()
                 requestPermissions()
+                startBgm()
             }
         }
     }
@@ -123,6 +126,17 @@ class FaceMatchActivity : AppCompatActivity() {
             val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
             cameraProvider?.bindToLifecycle(this, cameraSelector, preview, imageAnalyzer)
         }, ContextCompat.getMainExecutor(this))
+    }
+
+    private fun startBgm() {
+        val afd = assets.openFd("bgm_game.mp3")
+        bgmPlayer =
+            MediaPlayer().apply {
+                setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+                isLooping = true
+                prepare()
+                start()
+            }
     }
 
     @OptIn(ExperimentalGetImage::class)
@@ -291,5 +305,7 @@ class FaceMatchActivity : AppCompatActivity() {
         tflite?.close()
         tflite = null
         cameraProvider?.unbindAll()
+        bgmPlayer?.release()
+        bgmPlayer = null
     }
 }
